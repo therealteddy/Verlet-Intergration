@@ -9,6 +9,7 @@ double ToRadians(double Degrees) {
     return (double) (Degrees/360.0f) * (2*Pi);
 }
 
+/* There are so many things wrong with this function Ted. Fix later! */
 void GetAngularRotation(AngularObject* Object, Vector LinearVelocity, double radius, bool colliding) {
     double LinearVelocityMagnitude = VectorMagnitude(LinearVelocity); 
     if (!(colliding)){ 

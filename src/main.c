@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     /* VerletMotion Test Object */
     VerletObject MotionObject; 
     MotionObject.Acceleration = (Vector) {0, EARTH_GRAVITY_CONST}; 
-    MotionObject.PreviousPosition = (Vector) {100, 100}; 
+    MotionObject.PreviousPosition = (Vector) {90, 100-(EARTH_GRAVITY_CONST * dt())}; 
     MotionObject.Position = (Vector) {100, 100}; 
     MotionObject.Velocity = (Vector) {0, 0}; 
 

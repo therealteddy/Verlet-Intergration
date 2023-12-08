@@ -43,6 +43,9 @@ double Plate_GetTorque(double force, double height, double width);
 /* Get angular acceleration from torque and inertia */
 void GetAngularAcceleration(AngularObject* Object, double torque); 
 
+/* Get angular velocity for each timestep from angular acceleration */ 
+void GetAngularVelocity(AngularObject* Object); 
+
 /* Get Angular Displacement from angular velocity */
 void GetAngularDisplacement(AngularObject* Object); 
 

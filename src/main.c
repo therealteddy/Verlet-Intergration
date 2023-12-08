@@ -11,52 +11,52 @@
 #define WINDOW_T "Verlet Intergration"
 
 int main(int argc, char* argv[]) {
+    /* Declare Position of an object */ 
+    Rectangle Square; 
+    Square.height = 100; 
+    Square.width = 100; 
+    Square.x = 100; 
+    Square.y = 100; 
+
+    /* Update Object Position based on Linear Kinematics */ 
+    VerletObject VerletSquare = {0}; 
+    VerletSquare.Position = (Vector) {Square.x, Square.y}; 
+
+    /* Update Objects Rotation */ 
+    AngularObject AngularSquare; 
+    AngularSquare.Mass = 10; 
+    AngularSquare.Inertia = Plate_GetMomentOfInertia(AngularSquare.Mass, Square.width, Square.height); 
+
     InitWindow(WINDOW_W, WINDOW_H, WINDOW_T); 
-    SetTargetFPS(FPS_CAP);
-
-    /* Set a maximum of 100 objects */ 
-    VerletObject Squares[100]; 
-    Rect_CollisionData SquaresCollisionData[100]; 
-    unsigned int ObjectIndex = 0; 
-
-    /* Something to collide against! */
-    Rect_CollisionData GroundCollisioData = Rect_GetCollisionData((Vector) {0, WINDOW_H-50}, WINDOW_W, 50);
-
-    /* VerletMotion Test Object */
-    VerletObject MotionObject; 
-    MotionObject.Acceleration = (Vector) {0, EARTH_GRAVITY_CONST}; 
-    MotionObject.PreviousPosition = (Vector) {90, 100-(EARTH_GRAVITY_CONST * dt())}; 
-    MotionObject.Position = (Vector) {100, 100}; 
-    MotionObject.Velocity = (Vector) {0, 0}; 
-
-    /*Another test object */ 
-    VerletObject ComparisonObject; 
-    ComparisonObject.Position = (Vector) {300, 100}; 
+    SetTargetFPS(FPS_CAP); 
 
     while(!WindowShouldClose()) {
         BeginDrawing();
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) Squares[ObjectIndex++].Position = (Vector) {GetMousePosition().x, GetMousePosition().y};  
-        ClearBackground(BLACK);  
-        for (int i = 0; i < ObjectIndex; i++) { 
-            DrawRectangle(Squares[i].Position.x, Squares[i].Position.y, 100, 100, GRAY); 
-            SquaresCollisionData[i] = Rect_GetCollisionData((Vector) {Squares[i].Position.x, Squares[i].Position.y}, 100, 100);  
-            VerletGravity(&Squares[i], Rect_CheckCollision(SquaresCollisionData[i], GroundCollisioData)); 
-        }
-        DrawRectangle(MotionObject.Position.x, MotionObject.Position.y, 100, 100, WHITE);
-        DrawRectangle(ComparisonObject.Position.x, ComparisonObject.Position.y, 100, 100, WHITE);
-        Rect_CollisionData MotionObjectCollisionData = Rect_GetCollisionData((Vector) {MotionObject.Position.x, MotionObject.Position.y}, 100, 100);
-        Rect_CollisionData ComparisonObjectCollisionData = Rect_GetCollisionData((Vector) {ComparisonObject.Position.x, ComparisonObject.Position.y}, 100, 100); 
-        VerletMotion(&MotionObject, Rect_CheckCollision(GroundCollisioData, MotionObjectCollisionData)); 
-        VerletGravity(&ComparisonObject, Rect_CheckCollision(GroundCollisioData, ComparisonObjectCollisionData)); 
-        DrawRectangle(0, WINDOW_H-50, WINDOW_W, 50, WHITE);
-        DrawText(TextFormat("Object Count: %d/100 \n", ObjectIndex), 0, 0, 25, WHITE); 
-        DrawText(TextFormat("Dt: %f\n", GetFrameTime()), 650, 0, 25, WHITE);
-        DrawText(TextFormat("FPS: %d\n", GetFPS()), 700, 25, 25, WHITE);
-        DrawText(TextFormat("M(x,y): %f %f", MotionObject.Position.x, MotionObject.Position.y), 0, 25, 25, WHITE);
-        DrawText(TextFormat("C(x,y): %f %f", ComparisonObject.Position.x, ComparisonObject.Position.y), 0, 50, 25, WHITE); 
-        EndDrawing();
+            ClearBackground(BLACK); 
+            
+            /* Update Angular Stuff! */
+            GetAngularAcceleration(&AngularSquare, Plate_GetTorque(EARTH_GRAVITY_CONST, Square.height, Square.width)); 
+            GetAngularVelocity(&AngularSquare); 
+            GetAngularDisplacement(&AngularSquare); 
+
+            /* Update Linear Stuff */ 
+            VerletGravity(&VerletSquare, false); 
+            Square.x = VerletSquare.Position.x; 
+            Square.y = VerletSquare.Position.y; 
+
+            /* Render a quad! */
+            DrawRectanglePro(Square, 
+                (Vector2) {
+                    Square.width/2, 
+                    Square.height/2
+                }, 
+                AngularSquare.AngularDisplacement, 
+                RAYWHITE
+            ); 
+
+        EndDrawing(); 
     }
 
     CloseWindow(); 
-    return 0;
+    return 0; 
 }

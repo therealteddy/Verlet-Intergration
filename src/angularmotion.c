@@ -29,7 +29,7 @@ double Plate_GetTorque(double force, double width, double height) {
     double hw = height/2; 
     double ww = width/2; 
     double r = sqrt((hw)*(hw) + (ww)*(ww)); 
-    return (r * force) + (-r * force); /* Assuming origin is center (width/2, height/2)*/
+    return (r * force); /* Assuming origin is center (width/2, height/2)*/
 }
 
 void GetAngularAcceleration(AngularObject* Object, double torque) {

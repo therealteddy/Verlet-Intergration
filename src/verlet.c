@@ -5,7 +5,7 @@ void VerletGravity(VerletObject* Object, bool Colliding) {
    if (!Colliding) {
       Object->Position.y = Object->Position.y + (Object->Velocity.y * dt()) + (EARTH_GRAVITY_CONST * dt() * dt() * 0.5); 
       Object->Velocity.y = Object->Velocity.y + EARTH_GRAVITY_CONST * dt();
-   } else Object->Velocity.y = 0; 
+   } else Object->Velocity.y = 0.0f; 
 }
 
 void VerletMotion(VerletObject* Object, bool Colliding)
@@ -20,5 +20,5 @@ void VerletMotion(VerletObject* Object, bool Colliding)
       /*Upate Everything else :)*/ 
       Object->PreviousPosition = Object->Position; 
       Object->Position = Object->NextPosition;
-   } 
-}
+   } else Object->Velocity.y = 0.0f; 
+} 

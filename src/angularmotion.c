@@ -25,15 +25,38 @@ double GetAngularMomentum(AngularObject* Object) {
     return (Object->AngularVelocity * Object->Inertia); 
 }
 
-double Plate_GetTorque(double force, double width, double height) {
-    double hw = height/2; 
-    double ww = width/2; 
-    double r = sqrt((hw)*(hw) + (ww)*(ww)); 
-    return (r * force); /* Assuming origin is center (width/2, height/2)*/
+/// @brief Get Torque of a plate from a force that acts perpendicularly
+/// @param force Force that acts perpendicularly on the plate
+/// @param width Width of the plate
+/// @param height Height of the plate
+/// @param origin Axis along which the object is supposed to rotate; Relative to the origin - topleft of plate
+/// @return Return the resultant torque according to the principle of moments
+
+double Plate_GetTorque(double force, double width, double height, Vector origin) {
+    
+    /* Horribly Named Important variables */
+    
+    double tl, tr; /* Torque to the left and right of origin */
+    double rl, rr; /* Radii from the origin  */
+    double dw, dh; /* The individual components of a radii */
+    double ndw, ndh; /* The individual components of another radii */
+    
+    dw = width - origin.x; 
+    dh = height - origin.y;
+    ndw = width - dw; 
+    ndh = height - dh; 
+
+    /* Assuming force is perpendicular to the plate as only gravity acts as of now */
+    rr = VectorMagnitude((Vector) {dw, dh}); 
+    rl = VectorMagnitude((Vector) {ndw, ndh}); 
+    tr = rr * force; 
+    tl = rl * force; 
+
+    return (tr-tl); /* Resultant torque - According to the principle of moments */
 }
 
-void GetAngularAcceleration(AngularObject* Object, double torque) {
-    Object->AngularAcceleration = torque/Object->Inertia; 
+void GetAngularAcceleration(AngularObject* Object) {
+    Object->AngularAcceleration = Object->Torque/Object->Inertia; 
 }
 
 void GetAngularVelocity(AngularObject* Object) {
@@ -44,31 +67,10 @@ void GetAngularDisplacement(AngularObject* Object) {
     Object->AngularDisplacement += Object->AngularVelocity * dt();  
 }
 
-void AngularDisplacementFromLinearVelocity(AngularObject* Object, Vector LinearVelocity, double radius, bool colliding, unsigned int Shape) {
-    /* Get Resultant Vector of Linear Velocity */ 
-    double LinearResulatant = VectorMagnitude(LinearVelocity); 
-
-    /* Get Moment of inertia assuming uniform mass */ 
-    switch (Shape)
-    {
-    case DISK:
-        Object->Inertia = Disk_GetMomentOfInertia(Object->Mass, radius); 
-        break;
-    
-    case RING: 
-        Object->Inertia = Ring_GetMomentOfInertia(Object->Mass, radius);
-        break; 
-
-    case PLATE: 
-        //Implement later; 
-        break; 
-
-    default:
-        break;
-    }
-
-    if (!colliding) {
-        Object->AngularVelocity += (LinearResulatant/radius) * dt(); 
-        Object->AngularDisplacement += Object->AngularVelocity; 
-    } else Object->AngularVelocity = 0.0f; 
+void Plate_AngularUpdate(AngularObject* Plate, bool Colliding) {
+    if (!Colliding) {
+        GetAngularAcceleration(Plate);
+        GetAngularVelocity(Plate); 
+        GetAngularDisplacement(Plate); 
+    } else Plate->AngularDisplacement = 0.0f;
 }

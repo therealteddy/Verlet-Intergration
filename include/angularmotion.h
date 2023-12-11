@@ -3,17 +3,19 @@
 
 #include "vectors.h"
 #include "verlet.h"
+#include "raylib.h"
 #include <math.h>
 
 enum Shapes {PLATE, DISK, RING}; 
 
 typedef struct {
-    double AngularVelocity; 
     double AngularAcceleration; 
     double AngularDisplacement;
-    double Rotation;  
-    double Inertia;   
+    double AngularVelocity;   
+    double Inertia;  
+    double Torque; 
     double Mass; 
+    Vector Axis;
 } AngularObject; 
 
 /* Convert Degrees to radians */
@@ -37,16 +39,19 @@ double Ring_GetMomentOfInertia(double mass, double radius);
 /* Calculate angular momentum */ 
 double GetAngularMomentum(AngularObject* Object); 
 
-/* Get torque of a plate assuming rotational axis is at the center */  
-double Plate_GetTorque(double force, double height, double width); 
+/* Get torque of a plate given rotational axis is at the origin */  
+double Plate_GetTorque(double force, double height, double width, Vector origin); 
 
 /* Get angular acceleration from torque and inertia */
-void GetAngularAcceleration(AngularObject* Object, double torque); 
+void GetAngularAcceleration(AngularObject* Object); 
 
 /* Get angular velocity for each timestep from angular acceleration */ 
 void GetAngularVelocity(AngularObject* Object); 
 
 /* Get Angular Displacement from angular velocity */
 void GetAngularDisplacement(AngularObject* Object); 
+
+/* Update Angular Momentum of a plate */
+void Plate_AngularUpdate(AngularObject* Object, bool Colliding); 
 
 #endif /* ANGULAR_MOTION_H */

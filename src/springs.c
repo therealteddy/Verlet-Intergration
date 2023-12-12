@@ -39,7 +39,7 @@ void SpringMotion2D(Spring* Coil, Particle* Load, double Damping) {
     Load->Position.x = Coil->ParticlePoint.x; 
 
     /* Calculate the Y component */
-    Weight = Load->Mass * EARTH_GRAVITY_CONST;
+    Weight = Load->Mass * EARTH_GRAVITY_CONST_ACTUAL;
     SpringForceY = -1 * (Coil->SpringConst) * (Coil->ParticlePoint.y - Coil->AnchorPoint.y); 
     DampingForceY = Damping * VelocityY; 
     NetForceY = SpringForceY + Weight - DampingForceY; 
